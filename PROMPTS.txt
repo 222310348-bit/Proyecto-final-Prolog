@@ -1,0 +1,85 @@
+Plataforma: notebooklm.google.com
+SOLCITUD 1
+De acuerdo a este formato y ejemplos de los hechos de vacantes, genera 7 hechos diversos más
+% vacante(Id, RequisitosObligatorios, Deseables)
+vacante(v01, [sql, git, espanol],
+[python, mongodb, rest_api, ingles]).
+vacante(v02, [java, docker, espanol],
+[spring_boot, kubernetes, ingles]).
+
+Vuelve a generarlos pero que tengan correlacion al tipo de datos y valores que se le han insertado a los candidatos:
+candidato(Id, Nombre, Habilidades, Idiomas).
+
+
+candidato(c01, ana_torres,[python, sql, mongodb, rest_api, git],[espanol, ingles]).
+candidato(c02, luis_mendez,[java, sql, spring_boot, docker, git],[espanol]).
+candidato(c03, sofia_reyes,[python, r, machine_learning, sql, tableau],[espanol, ingles, frances]).
+candidato(c04, luis_astorga,[java, mongodb, rest_api, sprint_boot],[espanol, ingles]).
+candidato(c05, edson_lozano,[java, sql, spring_boot, docker, git],[espanol]).
+candidato(c06, brian_hernandez,[python, react, machine_learning, mongodb, tableau],[espanol, ingles, aleman]).
+candidato(c07, jesus_alberto,[python, sql, mongodb, rest_api, git],[espanol, ingles]).
+candidato(c08, miguel_perez,[java, sql, spring_boot, docker, git],[espanol]).
+candidato(c09, juan_reyes,[python, r, machine_learning, sql, tableau],[ingles, frances]).
+candidato(c10, carlos_garcia,[java, mongodb, rest_api, sprint_boot],[espanol, ingles]).
+candidato(c11, sofia_lopez,[python, sql, mongodb, rest_api, git],[espanol, ingles]).
+
+Recuerda que para el uso practico del sistema de seleccion la relación entre vacante y candidato no debe ser tal cual directa
+Entonces los hechos que me has redactado para vacantes cumplen con estos lineamientos? sino vuelvelos a generar
+
+
+RESULTADO 1
+
+Aquí tienes los 8 hechos corregidos y diversificados:
+% vacante(Id, RequisitosObligatorios, Deseables)
+
+% v03: Analista de Datos Senior (Apto: c03, c09. c01 no es apto por falta de 'r')
+vacante(v03, [python, r, sql], 
+             [machine_learning, tableau, ingles, frances, mongodb]).
+
+% v04: Desarrollador Backend Java (Apto: c02, c05, c08. c04 no es apto por falta de 'sql')
+vacante(v04, [java, sql, git], 
+             [spring_boot, docker, espanol, rest_api]).
+
+% v05: Consultor Técnico Junior (Alta competitividad, muchos candidatos aptos)
+vacante(v05, [sql, espanol], 
+             [python, java, git, rest_api, mongodb, ingles]).
+
+% v06: Especialista en IA y Visualización (Apto: c06. c03 no es apto por falta de 'react')
+vacante(v06, [python, machine_learning, react], 
+             [tableau, mongodb, espanol, ingles, aleman]).
+
+% v07: Fullstack Intermedio (Enfocado en c04 y c10 - incluye el typo 'sprint_boot' de tus hechos)
+vacante(v07, [java, mongodb, sprint_boot], 
+             [rest_api, ingles, sql, git, espanol]).
+
+% v08: Desarrollador Cloud (Apto: c02, c05, c08 por tener 'docker' y 'git')
+vacante(v08, [docker, git, espanol], 
+             [java, sql, spring_boot, rest_api, python]).
+
+% v09: Arquitecto de Soluciones (Muy exigente, pocos candidatos cumplen los obligatorios)
+vacante(v09, [rest_api, mongodb, sql, ingles], 
+             [python, java, git, spring_boot, docker, frances]).
+
+% v10: Especialista en Integración y Bases de Datos
+% Apto para: c01, c07, c11 (cumplen con sql, rest_api e ingles).
+% Descartados: c02, c05, c08 (aunque son expertos en SQL, les falta 'rest_api' e 'ingles').
+vacante(v10, [sql, rest_api, ingles], 
+              [python, mongodb, git, docker, java, espanol]).
+
+
+
+
+SOLCITUD 2
+Ahora para el siguiente segmento del codigo:
+% Verifica requisitos obligatorios
+Como lo implemento?
+
+RESULTADO 2
+Para implementar la verificación de requisitos obligatorios en tu proyecto, debes utilizar el predicado cumple_requisitos/2, el cual es una pieza fundamental del motor de inferencia en el módulo compatibilidad.pl.
+De acuerdo con las fuentes, la implementación exacta debe seguir esta lógica:
+% Verifica requisitos obligatorios
+cumple_requisitos(CandId, VacId) :-
+    candidato(CandId, _, Habs, Idiomas),
+    vacante(VacId, Obligatorios, _),
+    append(Habs, Idiomas, Todo),
+    subset(Obligatorios, Todo).
