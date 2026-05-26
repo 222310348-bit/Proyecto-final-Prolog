@@ -35,9 +35,3 @@ vacante(v08, [docker, git, espanol],
 % v09: Arquitecto de Soluciones (Muy exigente, pocos candidatos cumplen los obligatorios)
 vacante(v09, [rest_api, mongodb, sql, ingles], 
              [python, java, git, spring_boot, docker, frances]).
-
-% v10: Especialista en Integración y Bases de Datos
-% Apto para: c01, c07, c11 (cumplen con sql, rest_api e ingles).
-% Descartados: c02, c05, c08 (aunque son expertos en SQL, les falta 'rest_api' e 'ingles').
-vacante(v10, [sql, rest_api, ingles], 
-              [python, mongodb, git, docker, java, espanol]).
