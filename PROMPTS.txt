@@ -271,3 +271,51 @@ Uso de read/1: Recuerda que al ingresar datos en la consola de Prolog (como v01 
 Limpieza de pantalla: Aunque Prolog estándar no tiene un comando universal de limpieza, puedes usar múltiples saltos de línea (nl) para separar las ejecuciones y mantener la claridad visual.
 Validación de existencia: Como se muestra en el ejemplo, es buena práctica verificar si el ID ingresado realmente existe en la base de conocimiento antes de intentar procesar el reporte o la búsqueda.
 Al completar este módulo, habrás cumplido con el Paso 6 de la guía de implementación y estarás listo para realizar la defensa oral de tu proyecto.
+
+
+EXTENSION ESPECIAL
+SOLICITUD 7
+Ayudame a conocer como realizar:
+Extensión: ponderación de atributos
+Como extensión avanzada, el equipo puede asignar pesos distintos a los atributos deseables (p. ej., ingles con peso 2, python con peso 1) y calcular el puntaje como suma ponderada recorriendo la lista con foldl/4.
+
+
+RESULTADO 7
+Para implementar la ponderación de atributos como una extensión avanzada de tu proyecto, debes modificar la lógica del cálculo del puntaje para que no solo cuente la cantidad de coincidencias, sino que sume valores específicos asignados a cada competencia.
+De acuerdo con la Sección 9 de la propuesta, esta implementación requiere el uso de la meta-predicado foldl/4 para recorrer la lista de atributos comunes y realizar una suma ponderada.
+Aquí tienes los pasos para desarrollarlo:
+1. Definir los Pesos en la Base de Conocimiento
+Primero, debes establecer cuánto vale cada atributo. Puedes añadir estos hechos en tu archivo vacantes.pl o directamente en compatibilidad.pl.
+% Definición de pesos para atributos deseables
+% Los atributos no listados aquí se considerarán con peso 1 por defecto.
+valor_atributo(ingles, 2).
+valor_atributo(python, 2).
+valor_atributo(java, 2).
+valor_atributo(liderazgo, 3).
+2. Crear el Predicado Auxiliar para la Suma
+Para usar foldl/4, necesitas un predicado que tome un elemento de la lista, el acumulador actual y devuelva el nuevo total.
+% sumar_ponderado(Atributo, AcumuladorPrevio, NuevoTotal)
+sumar_ponderado(Atributo, AccIn, AccOut) :-
+    (valor_atributo(Atributo, P) -> 
+        AccOut is AccIn + P ; 
+        AccOut is AccIn + 1).
+Lógica: Si el atributo tiene un peso definido en valor_atributo/2, se suma ese valor (P); de lo contrario, se suma el valor base de 1.
+3. Implementar el nuevo puntaje/3 con foldl/4
+Ahora, sustituye la versión básica de puntaje/3 (que usaba length/2) por esta versión ponderada en tu módulo compatibilidad.pl.
+% Calcula puntaje como suma ponderada de atributos deseables comunes
+puntaje(CandId, VacId, Score) :-
+    candidato(CandId, _, Habs, Idiomas),
+    vacante(VacId, _, Deseables),
+    append(Habs, Idiomas, Todo),
+    intersection(Todo, Deseables, Comunes),
+    % foldl(Meta, Lista, ValorInicial, ResultadoFinal)
+    foldl(sumar_ponderado, Comunes, 0, Score).
+¿Cómo funciona esta mejora técnica?
+Intersección: Al igual que antes, el sistema identifica qué atributos deseables de la vacante posee el candidato mediante intersection/3.
+Recorrido con foldl/4: En lugar de solo contar la lista, foldl aplica el predicado sumar_ponderado a cada elemento de la lista Comunes.
+Acumulación Dinámica: El proceso comienza en 0. Si la lista es [ingles, sql], el sistema buscará el peso de ingles (2) y lo sumará a 0, luego buscará el de sql (1) y lo sumará al 2 anterior, resultando en un Score de 3.
+Beneficios para tu calificación:
+Complejidad Técnica: Cumples con el objetivo específico de implementar una intersección ponderada.
+Dominio de Listas: El uso de foldl/4 demuestra un nivel avanzado en la manipulación de listas, superando el requisito básico de usar solo predicados estándar como member o append.
+Ranking más preciso: Esto permitirá que candidatos con habilidades críticas (como idiomas o tecnologías clave) escalen posiciones en el ranking generado por generar_ranking/2.
+Recuerda que, al implementar esto, los resultados de tus casos de prueba #3 y #4 cambiarán. Deberás actualizar tu tabla de documentación para reflejar los nuevos puntajes ponderados.
