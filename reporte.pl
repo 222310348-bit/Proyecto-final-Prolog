@@ -5,7 +5,7 @@
 % Este predicado presenta la lista de candidatos aptos con puntaje y la lista de descartados con razón detallada.
 
 reporte_seleccion(VacId) :-
-    vacante(VacId, Puesto, _, _), % Opcional: obtener el nombre del puesto
+    vacante(VacId, _, _),
     format('~n--- REPORTE DE SELECCIÓN: ~w ---~n', [VacId]),
     
     % Parte 1: Candidatos Aptos
