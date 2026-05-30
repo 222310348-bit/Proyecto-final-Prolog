@@ -1,4 +1,5 @@
-% Hechos candidato/4 con nombre, habilidades tï¿½cnicas, idiomas y experiencia (aï¿½os) como listas.
+% Hechos candidato/3 con nombre, habilidades técnicas e idiomas como
+% listas.
 
 % Formato: candidato(Id, Nombre, Habilidades, Idiomas).
 

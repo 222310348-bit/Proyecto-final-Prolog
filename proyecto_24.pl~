@@ -19,3 +19,8 @@
 
 % Interfaz de Usuario
 :- consult('ui.pl').
+
+% Predicado de arranque del sistema
+inicio :- 
+    write('Sistema de Seleccion de Personal Cargado con Exito.'), nl,
+    write('Use reporte_seleccion(IdVacante) para probar el sistema.'), nl.

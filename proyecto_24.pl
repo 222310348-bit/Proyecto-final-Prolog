@@ -21,6 +21,7 @@
 :- consult('ui.pl').
 
 % Predicado de arranque del sistema
-inicio :- 
+inicio :-
     write('Sistema de Seleccion de Personal Cargado con Exito.'), nl,
-    write('Use reporte_seleccion(IdVacante) para probar el sistema.'), nl.
+    write('Ingrese "menu." para iniciar la Interfaz de Usuario.'), nl,
+    write('O use "reporte_seleccion(IdVacante)." para probar el sistema.'), nl.

@@ -1,5 +1,4 @@
-% Predicado generar_ranking/2 que filtra, puntúa y ordena la lista de
-% candidatos.
+% Predicado generar_ranking/2 que filtra, puntï¿½a y ordena la lista de candidatos.
 
 % Genera ranking de candidatos aptos para una vacante
 generar_ranking(VacId, Ranking) :-
