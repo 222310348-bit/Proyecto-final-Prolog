@@ -1,0 +1,21 @@
+% Menú interactivo para ingresar vacante y visualizar resultados.
+
+% Punto de entrada al sistema
+menu :-
+    repeat,
+    nl, write('=== SIMULADOR DE SELECCIÓN DE PERSONAL ==='), nl,
+    write('1. Generar Reporte de Selección por Vacante'), nl,
+    write('2. Buscar Vacantes Compatibles para un Candidato'), nl,
+    write('3. Salir'), nl,
+    write('Seleccione una opción: '),
+    read(Opcion),
+    ejecutar_opcion(Opcion),
+    Opcion == 3, !.
+    % El ciclo termina si la opción es 3
+
+
+
+
+
+
+
