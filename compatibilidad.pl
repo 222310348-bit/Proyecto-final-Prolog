@@ -15,3 +15,11 @@ puntaje(CandId, VacId, Score) :-
     append(Habs, Idiomas, Todo),
     intersection(Todo, Deseables, Comunes),
     length(Comunes, Score).
+
+% Lista habilidades e idiomas faltantes
+% Usa subtract/3 para obtener los requisitos obligatorios no cubiertos.
+habilidades_faltantes(CandId, VacId, Faltantes) :-
+    candidato(CandId, _, Habs, Idiomas),
+    vacante(VacId, Obligatorios, _),
+    append(Habs, Idiomas, Todo),
+    subtract(Obligatorios, Todo, Faltantes).
