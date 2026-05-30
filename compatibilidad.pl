@@ -7,3 +7,11 @@ cumple_requisitos(CandId, VacId) :-
     vacante(VacId, Obligatorios, _),
     append(Habs, Idiomas, Todo),
     subset(Obligatorios, Todo).
+
+% Calcula puntaje por interseccion de deseables
+puntaje(CandId, VacId, Score) :-
+    candidato(CandId, _, Habs, Idiomas),
+    vacante(VacId, _, Deseables),
+    append(Habs, Idiomas, Todo),
+    intersection(Todo, Deseables, Comunes),
+    length(Comunes, Score).
