@@ -1,4 +1,7 @@
 Plataforma: notebooklm.google.com
+
+
+
 SOLCITUD 1
 De acuerdo a este formato y ejemplos de los hechos de vacantes, genera 7 hechos diversos más
 % vacante(Id, RequisitosObligatorios, Deseables)
@@ -83,3 +86,188 @@ cumple_requisitos(CandId, VacId) :-
     vacante(VacId, Obligatorios, _),
     append(Habs, Idiomas, Todo),
     subset(Obligatorios, Todo).
+
+
+SOLICITUD 3
+Como puedo desarrollar las 2 funcionalidades faltantes?
+habilidades_faltantes/3;
+vacantes_compatibles/2
+
+RESULTADO 3
+Para desarrollar las dos funcionalidades faltantes, debes basarte en el uso de operaciones de conjuntos y predicados de recolección (como findall/3), siguiendo la arquitectura modular que ya hemos establecido.
+Aquí tienes la implementación detallada para cada una, fundamentada en los requerimientos del proyecto:
+1. Implementación de habilidades_faltantes/3
+Este predicado es vital para el reporte de descarte, ya que identifica qué requisitos obligatorios le faltan a un candidato para un puesto específico.
+Módulo: compatibilidad.pl
+% habilidades_faltantes(CandId, VacId, Faltantes)
+% Usa subtract/3 para obtener los requisitos obligatorios no cubiertos.
+habilidades_faltantes(CandId, VacId, Faltantes) :-
+    candidato(CandId, _, Habs, Idiomas),
+    vacante(VacId, Obligatorios, _),
+    append(Habs, Idiomas, Todo),
+    subtract(Obligatorios, Todo, Faltantes).
+Lógica: Primero unifica todas las habilidades e idiomas del candidato en la lista Todo. Luego, la función subtract/3 toma la lista de requisitos Obligatorios y le quita todos los elementos que el candidato ya posee (Todo). Lo que queda en la variable Faltantes es la "razón de descarte".
+Utilidad: Si un candidato es apto, Faltantes será una lista vacía [].
+2. Implementación de vacantes_compatibles/2
+Este predicado cumple con el objetivo de búsqueda inversa: dado un candidato, el sistema debe ser capaz de listar todos los puestos para los que califica.
+Módulo: busqueda_inversa.pl
+% vacantes_compatibles(CandId, ListaVacantes)
+% Búsqueda inversa: lista las vacantes cuyos requisitos obligatorios se cumplen.
+vacantes_compatibles(CandId, ListaVacantes) :-
+    findall(VacId, cumple_requisitos(CandId, VacId), ListaVacantes).
+Lógica: Utiliza el predicado findall/3 para recolectar todos los identificadores de vacantes (VacId) donde la condición cumple_requisitos(CandId, VacId) sea verdadera para el candidato consultado.
+Resultado: Genera una lista con los IDs de todas las vacantes compatibles (por ejemplo: [v01, v05, v09]).
+
+SOLICITUD 4
+Ahora explícame como desarrollar el módulo de reportes en reporte.pl
+
+RESULTADO 4
+Para desarrollar el módulo reporte.pl, debes crear el predicado reporte_seleccion/1, el cual integra toda la lógica de los módulos anteriores para presentar los resultados de forma legible.
+De acuerdo con los objetivos del proyecto, este reporte debe dividir los resultados en dos secciones principales: los candidatos aptos (con su puntaje) y los candidatos descartados (con su justificación).
+A continuación, te explico cómo implementarlo paso a paso:
+1. Estructura Principal del Reporte
+El predicado debe recibir el ID de la vacante y realizar tres tareas: obtener el ranking, identificar a los descartados y mostrar los datos.
+% reporte_seleccion(VacId)
+% Genera el informe completo de la selección para una vacante.
+reporte_seleccion(VacId) :-
+    vacante(VacId, Puesto, _, _), % Opcional: obtener el nombre del puesto
+    format('~n--- REPORTE DE SELECCIÓN: ~w ---~n', [VacId]),
+    
+    % Parte 1: Candidatos Aptos
+    format('~nCANDIDATOS RECOMENDADOS (Ordenados por puntaje):~n'),
+    generar_ranking(VacId, Ranking),
+    mostrar_aptos(Ranking),
+    
+    % Parte 2: Candidatos Descartados
+    format('~nCANDIDATOS NO APTOS (Con razón de descarte):~n'),
+    mostrar_descartados(VacId),
+    format('~n--- Fin del Reporte ---~n').
+2. Mostrar Candidatos Aptos
+Este sub-predicado recorre la lista de pares Puntaje-Id generada por el módulo de ranking.
+% Caso base: cuando la lista está vacía
+mostrar_aptos([]).
+% Caso recursivo: imprime el nombre y el puntaje
+mostrar_aptos([Score-CandId | Resto]) :-
+    candidato(CandId, Nombre, _, _),
+    format('- ~w (~w): Puntaje de compatibilidad: ~w~n', [Nombre, CandId, Score]),
+    mostrar_aptos(Resto).
+3. Mostrar Candidatos Descartados (Justificación)
+Aquí es donde aplicas la lógica de habilidades_faltantes/3 y la operación subtract/3 para explicar por qué no fueron seleccionados.
+% Identifica y justifica a quienes no cumplieron los obligatorios
+mostrar_descartados(VacId) :-
+    findall(CandId, (candidato(CandId, _, _, _), \+ cumple_requisitos(CandId, VacId)), Descartados),
+    imprimir_motivos(VacId, Descartados).
+
+imprimir_motivos(_, []).
+imprimir_motivos(VacId, [CandId | Resto]) :-
+    candidato(CandId, Nombre, _, _),
+    habilidades_faltantes(CandId, VacId, Faltantes),
+    format('- ~w (~w): No cumple con: ~w~n', [Nombre, CandId, Faltantes]),
+    imprimir_motivos(VacId, Resto).
+Consideraciones clave según tus fuentes:
+Formato de salida: El uso de format/2 o write/1 es esencial para cumplir con el criterio de una interfaz que guíe al usuario.
+Uso de Listas: El reporte es el resultado final del manejo de listas; Ranking es una lista de pares y Faltantes es una lista de átomos obtenida por sustracción.
+Integración: Este módulo depende de que ranking.pl y compatibilidad.pl estén cargados correctamente en tu archivo principal proyecto_24.pl.
+Casos de prueba: Al ejecutar reporte_seleccion(v01), deberías obtener una salida similar a la planteada en el caso de prueba #6 de la propuesta.
+Este módulo transforma los datos lógicos en información útil para un proceso de Recursos Humanos, cumpliendo así con el objetivo de simular un sistema experto auténtico.
+
+
+SOLICITUD 5
+Antes de continuar con el desarrollo, como implemento los modulos definidos en un solo sistema para poder hacer pruebas desde la consola?
+
+
+RESULTADO 5
+Para implementar todos los módulos en un solo sistema y poder realizar pruebas integrales desde la consola, debes seguir el Paso 1 de la guía de implementación, que consiste en crear un archivo principal denominado proyecto_24.pl.
+Este archivo actuará como el "punto de entrada" del sistema y su función primordial es cargar todos los componentes que has desarrollado por separado.
+1. Creación del archivo principal proyecto_24.pl
+Debes crear un archivo de texto con extensión .pl que contenga las directivas de carga para cada uno de los módulos definidos en la arquitectura. El contenido del archivo debe ser el siguiente:
+% ==========================================================
+% PROYECTO 24: SIMULADOR DE SELECCIÓN DE PERSONAL
+% Archivo Principal de Carga
+% ==========================================================
+
+% Carga de la Base de Conocimiento
+:- consult('candidatos.pl').
+:- consult('vacantes.pl').
+
+% Carga del Motor de Inferencia y Lógica
+:- consult('compatibilidad.pl').
+:- consult('ranking.pl').
+:- consult('busqueda_inversa.pl').
+
+% Carga de la Interfaz y Reportes
+:- consult('reporte.pl').
+:- consult('ui.pl').
+
+% Predicado de inicio (opcional por ahora)
+inicio :- 
+    write('Sistema de Seleccion de Personal Cargado con Exito.'), nl,
+    write('Use reporte_seleccion(IdVacante) para probar el sistema.'), nl.
+2. Cómo realizar las pruebas desde la consola
+Una vez que tengas todos los archivos .pl en la misma carpeta, sigue estos pasos para probar la integración:
+Carga del sistema: Abre SWI-Prolog y carga únicamente el archivo principal ejecutando: ?- consult('proyecto_24.pl'). Si la arquitectura es correcta, Prolog cargará automáticamente todos los demás archivos sin errores.
+Prueba de predicados aislados: Antes de usar el menú final, verifica que los módulos se "hablan" entre sí ejecutando consultas directas en la consola:
+Verificar carga de datos: ?- candidato(c01, Nombre, _, _).
+Probar compatibilidad: ?- cumple_requisitos(c01, v01).
+Probar ranking: ?- generar_ranking(v01, Ranking).
+Prueba de reporte integral: Ejecuta el mando principal del módulo de reportes para ver el resultado combinado: ?- reporte_seleccion(v01).
+Por qué es necesaria esta integración
+Criterio de Aceptación: Uno de los requisitos obligatorios para la entrega es que el sistema cargue sin errores mediante consult('proyecto_24.pl').
+Organización Modular: Permite mantener la separación clara entre la base de conocimiento, el motor de inferencia y la interfaz, lo cual es evaluado en la calidad del código.
+Facilidad de Depuración: Al cargar todo el sistema, puedes usar el predicado de búsqueda inversa (vacantes_compatibles/2) para verificar si un candidato específico está siendo reconocido correctamente por las vacantes de la base de conocimiento.
+Una vez que verifiques que todos los módulos funcionan juntos en la consola, estarás listo para el Paso 6: desarrollar el menú interactivo final en el módulo ui.pl.
+
+
+SOLICITUD 6
+¿Cómo puedo diseñar el menú interactivo en el módulo ui.pl?
+
+RESULTADO 6
+Para diseñar el menú interactivo en el módulo ui.pl, debes crear un predicado principal (generalmente llamado menu/0 o main/0) que permita al usuario operar el sistema sin necesidad de conocer la sintaxis técnica de Prolog.
+Según los requerimientos de la Propuesta #24 y los criterios de aceptación, el diseño debe ser intuitivo, guiar al usuario en todo momento y manejar entradas inválidas de forma descriptiva.
+1. Estructura básica del menú (ui.pl)
+El menú debe ser un ciclo que se repita hasta que el usuario decida salir. Puedes implementarlo de la siguiente manera:
+% Punto de entrada al sistema
+menu :-
+    repeat,
+    nl, write('=== SIMULADOR DE SELECCIÓN DE PERSONAL ==='), nl,
+    write('1. Generar Reporte de Selección por Vacante'), nl,
+    write('2. Buscar Vacantes Compatibles para un Candidato'), nl,
+    write('3. Salir'), nl,
+    write('Seleccione una opción: '),
+    read(Opcion),
+    ejecutar_opcion(Opcion),
+    Opcion == 3, !. % El ciclo termina si la opción es 3
+2. Implementación de las acciones
+Debes definir el predicado ejecutar_opcion/1 para que llame a las funciones de los módulos que ya has desarrollado:
+Opción 1 (Reporte): Solicita el ID de la vacante y llama a reporte_seleccion/1.
+Opción 2 (Búsqueda Inversa): Solicita el ID del candidato y utiliza vacantes_compatibles/2.
+Manejo de errores: Si el usuario ingresa algo distinto a las opciones válidas, el sistema debe informar el error.
+% Opción 1: Generar reporte
+ejecutar_opcion(1) :-
+    write('Ingrese el ID de la Vacante (ej. v01): '),
+    read(VacId),
+    (vacante(VacId, _, _) -> 
+        reporte_seleccion(VacId) ; 
+        write('Error: La vacante no existe.')), nl.
+
+% Opción 2: Búsqueda inversa
+ejecutar_opcion(2) :-
+    write('Ingrese el ID del Candidato (ej. c01): '),
+    read(CandId),
+    (candidato(CandId, _, _, _) -> 
+        vacantes_compatibles(CandId, Lista),
+        format('El candidato ~w es apto para las vacantes: ~w~n', [CandId, Lista]) ;
+        write('Error: El candidato no existe.')), nl.
+
+% Opción 3: Salida
+ejecutar_opcion(3) :-
+    write('Saliendo del sistema...'), nl.
+
+% Manejo de entradas inválidas
+ejecutar_opcion(_) :-
+    write('Opción no válida, intente de nuevo.'), nl.
+3. Recomendaciones para el diseño
+Uso de read/1: Recuerda que al ingresar datos en la consola de Prolog (como v01 o 1), el usuario debe finalizar la entrada con un punto (.), por ejemplo: v01..
+Limpieza de pantalla: Aunque Prolog estándar no tiene un comando universal de limpieza, puedes usar múltiples saltos de línea (nl) para separar las ejecuciones y mantener la claridad visual.
+Validación de existencia: Como se muestra en el ejemplo, es buena práctica verificar si el ID ingresado realmente existe en la base de conocimiento antes de intentar procesar el reporte o la búsqueda.
+Al completar este módulo, habrás cumplido con el Paso 6 de la guía de implementación y estarás listo para realizar la defensa oral de tu proyecto.
