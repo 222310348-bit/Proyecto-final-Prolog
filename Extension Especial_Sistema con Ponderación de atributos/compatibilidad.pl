@@ -1,6 +1,5 @@
 % Predicados cumple_requisitos/2, puntaje/3 y habilidades_faltantes/3.
 
-
 % Verifica requisitos obligatorios
 cumple_requisitos(CandId, VacId) :-
     candidato(CandId, _, Habs, Idiomas),
@@ -10,8 +9,8 @@ cumple_requisitos(CandId, VacId) :-
 
 % sumar_ponderado(Atributo, AcumuladorPrevio, NuevoTotal)
 sumar_ponderado(Atributo, AccIn, AccOut) :-
-    (valor_atributo(Atributo, P) -> 
-        AccOut is AccIn + P ; 
+    (valor_atributo(Atributo, P) ->
+        AccOut is AccIn + P ;
         AccOut is AccIn + 1).
 
 % Calcula puntaje como suma ponderada de atributos deseables comunes

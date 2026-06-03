@@ -1,4 +1,4 @@
-% PROYECTO #24: SIMULADOR DE SELECCIÓN DE PERSONAL
+% PROYECTO #24: SIMULADOR DE SELECCION DE PERSONAL
 
 % Integrantes:
 % - Asorga Esquivel Luis Alberto 222310304
@@ -9,12 +9,12 @@
 :- consult('candidatos.pl').
 :- consult('vacantes.pl').
 
-% Motor de Inferencia y Funciones Lógicas
+% Motor de Inferencia y Funciones Lï¿½gicas
 :- consult('compatibilidad.pl').
 :- consult('ranking.pl').
 :- consult('busqueda_inversa.pl').
 
-% Generación de Reporte
+% Generacion de Reporte
 :- consult('reporte.pl').
 
 % Interfaz de Usuario
@@ -25,3 +25,5 @@ inicio :-
     write('Sistema de Seleccion de Personal Cargado con Exito.'), nl,
     write('Ingrese "menu." para iniciar la Interfaz de Usuario.'), nl,
     write('O use "reporte_seleccion(IdVacante)." para probar el sistema.'), nl.
+
+
